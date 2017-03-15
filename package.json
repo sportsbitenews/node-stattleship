@@ -1,6 +1,6 @@
 {
   "name": "node-stattleship",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "A NodeJS wrapper for the Stattleship API (http://developers.stattleship.com/)",
   "main": "index.js",
   "scripts": {
@@ -23,13 +23,15 @@
   },
   "homepage": "https://github.com/jlcarmic/node-stattleship#readme",
   "dependencies": {
+    "dotenv": "^4.0.0",
     "q": "^1.4.1",
+    "pluralize": "^4.0.0",
     "request-promise": "^3.0.0",
     "util": "^0.10.3"
   },
   "devDependencies": {
     "chai": "^3.5.0",
-    "mocha": "^2.4.5",
+    "mocha": "^3.2.0",
     "nock": "^8.0.0"
   }
 }

@@ -1,8 +1,12 @@
+require('dotenv').config()
+
 var os = require('os');
+var pluralize = require('pluralize')
 var Q = require('q');
 var rp = require('request-promise');
 var util = require('util');
 var version = require('./package.json').version;
+var _ = require('lodash');
 
 // Private Vars
 var options = {
@@ -23,17 +27,35 @@ var platform = util.format('%s-%s%s', os.arch(), os.platform(), os.release());
 // Private Functions
 function callEndPoint(sport, league, endpoint, params, paginate, data, total) {
   var deferred = Q.defer();
-  options.uri = util.format("https://www.stattleship.com/%s/%s/%s", sport, league, endpoint);
+  options.uri = util.format("https://api.stattleship.com/%s/%s/%s", sport, league, endpoint);
   options.qs = params;
   options.qs.page = options.qs.page || 1;
-  console.log(options.qs.page);
+
+  // console.log(options.uri);
+  // console.log(options.qs);
+  // console.log(options.qs.page);
 
   rp(options).then(function(response) {
     total = response.headers.total;
-    console.log(total);
-    data = data.concat(response.body[endpoint]);
-    console.log(Object.keys(data).length);
+
+    var endpoint_pieces = endpoint.split('/') || [];
+    var path = endpoint_pieces[1];
+
+    var data_node = null;
+
+    if (path === undefined) {
+      data_node = endpoint_pieces[0];
+    } else {
+      data_node= pluralize.singular(endpoint_pieces[0]);
+    };
+
+    data = data.concat(response.body[data_node]);
     options.qs.page++;
+
+    // console.log(response.body);
+    // console.log(total);
+    // console.log(data_node);
+    // console.log(data.length);
 
     // Page is 0 if use did not specify specific page, if they did no need to recurse
     if(paginate && Object.keys(data).length < total) {
@@ -82,6 +104,19 @@ Stattleship.prototype.games = function(sport, league, params) {
   var paginate = (params.page === undefined);
 
   return callEndPoint(sport, league, "games", params, paginate, data, total)
+    .then(function(data) {
+      return data;
+  });
+};
+
+Stattleship.prototype.game = function(sport, league, params) {
+  var data = [];
+  var total = 0;
+  var paginate = (params.page === undefined);
+  var game_id = params['game_id'] || '';
+  params = _.omit(params, 'game_id');
+
+  return callEndPoint(sport, league, "games/" + game_id, params, paginate, data, total)
     .then(function(data) {
       return data;
   });

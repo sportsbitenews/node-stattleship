@@ -5,7 +5,7 @@ var util = require('util');
 var StattleshipAPI = require('../index.js');
 
 describe("stattleship", function() {
-  var stattleship = new StattleshipAPI('TEST_KEY');
+  var stattleship = new StattleshipAPI('TEST_API_KEY');
 
   describe("feats", function(done) {
     it("feats exists as a public method on stattleship", function (done) {
@@ -18,7 +18,7 @@ describe("stattleship", function() {
       var league = 'mlb';
 
       var endpoint = util.format('/%s/%s/feats?page=1', sport, league);
-      nock('https://www.stattleship.com')
+      nock('https://api.stattleship.com')
         .get(endpoint)
         .reply(200, { feats: [ { level: "rare" } ] });
 
@@ -42,7 +42,7 @@ describe("stattleship", function() {
       var league = 'mlb';
 
       var endpoint = util.format('/%s/%s/game_logs?page=1', sport, league);
-      nock('https://www.stattleship.com')
+      nock('https://api.stattleship.com')
         .get(endpoint)
         .reply(200, { game_logs: [ { home_team_outcome: "win" } ] });
 
@@ -66,12 +66,39 @@ describe("stattleship", function() {
       var league = 'mlb';
 
       var endpoint = util.format('/%s/%s/games?page=1', sport, league);
-      nock('https://www.stattleship.com')
+      nock('https://api.stattleship.com')
         .get(endpoint)
         .reply(200, { games: [ { label: "X-Men vs Avengers" } ] });
 
       stattleship.games(sport, league, {}).then(function(games) {
         expect(games[0].label).equals("X-Men vs Avengers");
+        done();
+      }).done(null, function(error) {
+        done(error);
+      });
+    });
+  });
+
+  describe("game", function(done) {
+    it("game exists as a public method on stattleship", function (done) {
+      expect(typeof stattleship.games).to.eql('function');
+      done();
+    });
+
+    it("is successful when correct params are supplied", function(done) {
+      var sport = 'basketball';
+      var league = 'nba';
+      var game_id = 'nba-2016-2017-ny-mia-2017-03-31-2000'
+      var params = { game_id: game_id };
+
+      var endpoint = util.format('/%s/%s/games/%s?page=1', sport, league, game_id);
+      nock('https://api.stattleship.com')
+        .get(endpoint)
+        .reply(200, { games: [ { slug: game_id } ] });
+
+      stattleship.game(sport, league, params).then(function(games) {
+        console.log(games);
+        expect(games[0].slug).equals(game_id);
         done();
       }).done(null, function(error) {
         done(error);
@@ -90,7 +117,7 @@ describe("stattleship", function() {
       var league = 'mlb';
 
       var endpoint = util.format('/%s/%s/injuries?page=1', sport, league);
-      nock('https://www.stattleship.com')
+      nock('https://api.stattleship.com')
         .get(endpoint)
         .reply(200, { injuries: [ { location_name: "Skull" } ] });
 
@@ -114,7 +141,7 @@ describe("stattleship", function() {
       var league = 'mlb';
 
       var endpoint = util.format('/%s/%s/penalties?page=1', sport, league);
-      nock('https://www.stattleship.com')
+      nock('https://api.stattleship.com')
         .get(endpoint)
         .reply(200, { penalties: [ { name: "Inappropriate Touching" } ] });
 
@@ -138,7 +165,7 @@ describe("stattleship", function() {
       var league = 'mlb';
 
       var endpoint = util.format('/%s/%s/players?page=1', sport, league);
-      nock('https://www.stattleship.com')
+      nock('https://api.stattleship.com')
         .get(endpoint)
         .reply(200, { players: [ { name: "Tony Stark" } ] });
 
@@ -162,7 +189,7 @@ describe("stattleship", function() {
       var league = 'mlb';
 
       var endpoint = util.format('/%s/%s/rankings?page=1', sport, league);
-      nock('https://www.stattleship.com')
+      nock('https://api.stattleship.com')
         .get(endpoint)
         .reply(200, { rankings: [ { place: 42 } ] });
 
@@ -186,7 +213,7 @@ describe("stattleship", function() {
       var league = 'mlb';
 
       var endpoint = util.format('/%s/%s/rosters?page=1', sport, league);
-      nock('https://www.stattleship.com')
+      nock('https://api.stattleship.com')
         .get(endpoint)
         .reply(200, { rosters: [ { team_id: 'kjh34kj23hkjh' } ] });
 
@@ -210,7 +237,7 @@ describe("stattleship", function() {
       var league = 'mlb';
 
       var endpoint = util.format('/%s/%s/scoring_plays?page=1', sport, league);
-      nock('https://www.stattleship.com')
+      nock('https://api.stattleship.com')
         .get(endpoint)
         .reply(200, { scoring_plays: [ { name: 'Touchdown' } ] });
 
@@ -234,7 +261,7 @@ describe("stattleship", function() {
       var league = 'mlb';
 
       var endpoint = util.format('/%s/%s/stat_leaders?page=1', sport, league);
-      nock('https://www.stattleship.com')
+      nock('https://api.stattleship.com')
         .get(endpoint)
         .reply(200, { stat_leaders: [ { stat_name: 'home_runs' } ] });
 
@@ -258,7 +285,7 @@ describe("stattleship", function() {
       var league = 'mlb';
 
       var endpoint = util.format('/%s/%s/stats?page=1', sport, league);
-      nock('https://www.stattleship.com')
+      nock('https://api.stattleship.com')
         .get(endpoint)
         .reply(200, { stats: [ { stat: 'passes_touchdowns' } ] });
 
@@ -282,7 +309,7 @@ describe("stattleship", function() {
       var league = 'mlb';
 
       var endpoint = util.format('/%s/%s/team_game_logs?page=1', sport, league);
-      nock('https://www.stattleship.com')
+      nock('https://api.stattleship.com')
         .get(endpoint)
         .reply(200, { team_game_logs: [ { home_team_outcome: 'win' } ] });
 
@@ -306,7 +333,7 @@ describe("stattleship", function() {
       var league = 'mlb';
 
       var endpoint = util.format('/%s/%s/team_outcome_streaks?page=1', sport, league);
-      nock('https://www.stattleship.com')
+      nock('https://api.stattleship.com')
         .get(endpoint)
         .reply(200, { team_outcome_streaks: [ { streak_length: 42 } ] });
 
@@ -330,7 +357,7 @@ describe("stattleship", function() {
       var league = 'mlb';
 
       var endpoint = util.format('/%s/%s/teams?page=1', sport, league);
-      nock('https://www.stattleship.com')
+      nock('https://api.stattleship.com')
         .get(endpoint)
         .reply(200, { teams: [ { nickname: 'Avengers' } ] });
 
@@ -354,7 +381,7 @@ describe("stattleship", function() {
       var league = 'mlb';
 
       var endpoint = util.format('/%s/%s/top_stats?page=1', sport, league);
-      nock('https://www.stattleship.com')
+      nock('https://api.stattleship.com')
         .get(endpoint)
         .reply(200, { top_stats: [ { stat_name: 'hits' } ] });
 
@@ -378,7 +405,7 @@ describe("stattleship", function() {
       var league = 'mlb';
 
       var endpoint = util.format('/%s/%s/total_stats?page=1', sport, league);
-      nock('https://www.stattleship.com')
+      nock('https://api.stattleship.com')
         .get(endpoint)
         .reply(200, { total_stats: [ { stat: 'passes_touchdowns' } ] });
 
